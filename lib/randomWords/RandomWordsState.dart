@@ -65,6 +65,16 @@ class RandomWordsState extends State<RandomWords>
                 alreadySaved ? Icons.favorite : Icons.favorite_border,
                 color: alreadySaved ? Colors.red : null,
             ),
+            onTap: (){
+                /*
+                 * In Flutter's reactive style framework, calling setState()
+                 * triggers a call to the build() method for the State object,
+                 * resulting in an update to the UI.
+                 */
+                setState(() {
+                  alreadySaved ? _savedWordPairs.remove(wordPair) : _savedWordPairs.add(wordPair);
+                });
+            },
         );
     }
 }
