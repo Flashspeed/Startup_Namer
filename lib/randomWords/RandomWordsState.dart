@@ -22,6 +22,9 @@ class RandomWordsState extends State<RandomWords>
         return Scaffold(
             appBar: AppBar(
                 title: Text('Startup Name Generator'),
+                actions: <Widget>[
+                    IconButton(icon: Icon(Icons.list, color: Colors.white,), onPressed: _pushSaved,)
+                ],
             ),
             body: _createSuggestedStartupNames(),
         );
@@ -65,16 +68,48 @@ class RandomWordsState extends State<RandomWords>
                 alreadySaved ? Icons.favorite : Icons.favorite_border,
                 color: alreadySaved ? Colors.red : null,
             ),
-            onTap: (){
+            onTap: ()
+            {
                 /*
                  * In Flutter's reactive style framework, calling setState()
                  * triggers a call to the build() method for the State object,
                  * resulting in an update to the UI.
                  */
-                setState(() {
-                  alreadySaved ? _savedWordPairs.remove(wordPair) : _savedWordPairs.add(wordPair);
+                setState(()
+                {
+                    alreadySaved
+                        ? _savedWordPairs.remove(wordPair)
+                        : _savedWordPairs.add(wordPair);
                 });
             },
         );
     }
+
+  void _pushSaved() {
+        Navigator.of(context).push(
+            MaterialPageRoute<void>(
+                builder: (BuildContext context){
+                    final Iterable<ListTile> tiles = _savedWordPairs.map(
+                        (WordPair wordPair){
+                            return ListTile(
+                                title: Text(
+                                    wordPair.asPascalCase,
+                                    style: _biggerFontStyle,
+                                ),
+                            );
+                        },
+                    );
+                    final List<Widget> divided = ListTile
+                        .divideTiles(context: context, tiles: tiles).toList();
+
+                    return Scaffold(
+                        appBar: AppBar(
+                            title: Text("Saved Suggestions"),
+                        ),
+                        body: ListView(children: divided)
+                    );
+                }
+            )
+        );
+  }
 }
