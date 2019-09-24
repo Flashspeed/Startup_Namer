@@ -1,4 +1,3 @@
-import 'package:english_words/english_words.dart' as prefix0;
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:startup_namer/randomWords/RandomWords.dart';
@@ -7,10 +6,15 @@ class RandomWordsState extends State<RandomWords>
 {
 
     /// Saves suggested word pairs
-    final _suggestions = <WordPair>[];
+    final List<WordPair> _suggestedStartupNames = <WordPair>[
+        WordPair("first", "item"),
+        WordPair("second", "item")
+    ];
+
+    final Set<WordPair> _savedWordPairs = Set<WordPair>();
 
     /// Makes the font size larger
-    final _biggerFontStyle = const TextStyle(fontSize: 18);
+    final TextStyle _biggerFontStyle = const TextStyle(fontSize: 18);
 
     @override
     Widget build(BuildContext context)
@@ -19,13 +23,14 @@ class RandomWordsState extends State<RandomWords>
             appBar: AppBar(
                 title: Text('Startup Name Generator'),
             ),
-            body: _buildSuggestions(),
+            body: _createSuggestedStartupNames(),
         );
     }
 
-    Widget _buildSuggestions()
+    Widget _createSuggestedStartupNames()
     {
         return ListView.builder(
+            // Set a padding for the whole ListView
             padding: EdgeInsets.all(16),
             itemBuilder: (context, item)
             {
@@ -33,21 +38,32 @@ class RandomWordsState extends State<RandomWords>
 
                 final index = item ~/ 2;
 
-                if (index >= this._suggestions.length)
+                /* If the index is at the last point in the suggestions array
+                *  then add 10 more generated items to the suggestions array.
+                *  This creates an infinite view of suggested words */
+                if (index >= this._suggestedStartupNames.length)
                 {
-                    _suggestions.addAll(prefix0.generateWordPairs().take(10));
+                    _suggestedStartupNames.addAll(generateWordPairs().take(10));
                 }
 
-                return _buildRow(_suggestions[index]);
+                return _rowItem(_suggestedStartupNames[index]);
             });
     }
 
-    Widget _buildRow(WordPair wordPair)
+    //_buildRow. The look for each row item
+    Widget _rowItem(WordPair wordPair)
     {
+        // Check if a word pair has already been saved by the user.
+        final bool alreadySaved = this._savedWordPairs.contains(wordPair);
+
         return ListTile(
             title: Text(
                 wordPair.asPascalCase,
                 style: _biggerFontStyle,
+            ),
+            trailing: Icon(
+                alreadySaved ? Icons.favorite : Icons.favorite_border,
+                color: alreadySaved ? Colors.red : null,
             ),
         );
     }
